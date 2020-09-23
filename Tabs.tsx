@@ -124,7 +124,11 @@ export const Tabs: FunctionComponent<Props> = props => {
  * 
  */
 
-export const TabList: FunctionComponent<Props> = props => {
+interface TabListProps {
+  children: any;
+}
+
+export const TabList: FunctionComponent<TabListProps> = props => {
   const { children, ...restProps } = props;
   const tabListRef = useRef<any>(null);
   const [focusedTabIndex, setFocusedTabIndex] = useState(-1);
@@ -244,9 +248,9 @@ export const TabPanel: FunctionComponent<TabPanelProps> = props => {
 
   return (
     tabContext.activeTab === tabCode && (
-      <div role="tabpanel" {...restProps}>
+      <StyledTabPanel role="tabpanel" {...restProps}>
         {children}
-      </div>
+      </StyledTabPanel>
     )
   );
 };
