@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect, useContext, useRef } from 'react';
+import React, { FunctionComponent, useState, useEffect, useContext, useRef, useImperativeHandle } from 'react';
 import styled, { css } from 'styled-components';
 
 export const StyledTabs = styled.div`
@@ -92,6 +92,7 @@ const LEFT_ARROW_CODE = 37;
 const RIGHT_ARROW_CODE = 39;
 
 export const TabContext = React.createContext<TabContextProps>({} as TabContextProps);
+
 export const TabListContext = React.createContext<TabListContextProps>({
   focusedTabIndex: 0,
   tabListLength: 0,
@@ -102,13 +103,22 @@ export const TabListContext = React.createContext<TabListContextProps>({
  * TABS - Main Component
  * 
  */
-export const Tabs: FunctionComponent<Props> = props => {
+export const Tabs: FunctionComponent<Props> = React.forwardRef((props, ref) => {
   const { initialTab, children, onTabChange, ...restProps } = props;
   const [activeTab, setActiveTab] = useState(initialTab);
+
   const tabProviderValue = { activeTab, setActiveTab, onTabChange };
 
+  // Part of our API -- consumer can call these methods via ref
+  // ex: myRef.current.next()
+  useImperativeHandle(ref, () => {
+    return {
+      next: () => console.log('next!'),
+      previous: () => console.log('previous!')
+    }
+  })
+
   useEffect(() => {
-    console.log('initialTab: ', initialTab);
     setActiveTab(initialTab);
   }, [initialTab]);
 
@@ -117,13 +127,12 @@ export const Tabs: FunctionComponent<Props> = props => {
       <StyledTabs {...restProps}>{children}</StyledTabs>
     </TabContext.Provider>
   );
-};
+});
 
 /* 
  * TABLIST 
  * 
  */
-
 interface TabListProps {
   children: any;
 }
@@ -138,7 +147,6 @@ export const TabList: FunctionComponent<TabListProps> = props => {
 
   //set focus
   useEffect(() => {
-    console.log('focusedTabIndex: ', focusedTabIndex);
     if (focusedTabIndex >= 0) {
       tabListRef.current?.querySelectorAll('[role=tab]')[focusedTabIndex]?.focus();
     }
@@ -166,7 +174,6 @@ export const Tab: FunctionComponent<TabProps> = props => {
   const { children, isActive, tabCode, ...restProps } = props;
   const tabContext = useContext(TabContext);
   const tabListContext = useContext(TabListContext);
-
   const tabIsSelected = tabContext.activeTab === tabCode;
 
   const handleClick = () => {
@@ -177,9 +184,9 @@ export const Tab: FunctionComponent<TabProps> = props => {
     }
   };
 
+  // set focused tab index
   useEffect(() => {
-    console.log(tabCode);
-    console.log('tab.tsx - useEffect');
+    console.log('tabCode: ', tabCode)
     tabListContext.setFocusedTabIndex((tabListContext.focusedTabIndex = tabListContext.focusedTabIndex + 1));
     console.log(tabListContext.focusedTabIndex);
   }, [tabCode]);
