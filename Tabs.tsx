@@ -1,4 +1,73 @@
 import React, { FunctionComponent, useState, useEffect, useContext, useRef } from 'react';
+import styled, { css } from 'styled-components';
+
+export const StyledTabs = styled.div`
+  background: inherit;
+  border-radius: 4px;
+  h1 {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+`;
+
+export const StyledTabList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+`;
+
+export const StyledTabContainer = styled.li`
+  display: inline-block;
+`;
+
+export const StyledTab = styled.button`
+  background: blue;
+  border-color: lightblue;
+  min-width: 120px;
+  text-align: center;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  margin-right: 14px;
+  outline: none;
+  border-width: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+
+  &.autosize: {
+    width: auto;
+  }
+
+  ${props =>
+    props.isActive &&
+    css`
+      background: white;
+      color: #0074c2;
+      border-color: white;
+      padding-bottom: 16px;
+    `};
+
+  ${props =>
+    !props.isActive &&
+    css`
+      border-bottom-width: 2px;
+    `};
+`;
+
+export const StyledTabPanel = styled.div`
+  background: white;
+  padding: 25px;
+  border-top-right-radius: 4px;
+`;
 
 interface Props {
   initialTab: string;
@@ -45,7 +114,7 @@ export const Tabs: FunctionComponent<Props> = props => {
 
   return (
     <TabContext.Provider value={tabProviderValue}>
-      <div {...restProps}>{children}</div>
+      <StyledTabs {...restProps}>{children}</StyledTabs>
     </TabContext.Provider>
   );
 };
@@ -72,9 +141,9 @@ export const TabList: FunctionComponent<Props> = props => {
   }, [focusedTabIndex]);
 
   return (
-    <ul ref={tabListRef} role="tablist" {...restProps}>
+    <StyledTabList ref={tabListRef} role="tablist" {...restProps}>
       <TabListContext.Provider value={tabListProviderValue}>{children}</TabListContext.Provider>
-    </ul>
+    </StyledTabList>
   );
 };
 
@@ -89,7 +158,7 @@ interface TabProps {
   tabCode: string;
 }
 
-const Tab: FunctionComponent<TabProps> = props => {
+export const Tab: FunctionComponent<TabProps> = props => {
   const { children, isActive, tabCode, ...restProps } = props;
   const tabContext = useContext(TabContext);
   const tabListContext = useContext(TabListContext);
@@ -132,8 +201,8 @@ const Tab: FunctionComponent<TabProps> = props => {
   };
 
   return (
-    <li role="presentation">
-      <button
+    <StyledTabContainer role="presentation">
+      <StyledTab
         id={'tab-' + tabCode}
         role="tab"
         aria-selected={tabIsSelected}
@@ -143,8 +212,8 @@ const Tab: FunctionComponent<TabProps> = props => {
         {...restProps}
       >
         {children}
-      </button>
-    </li>
+      </StyledTab>
+    </StyledTabContainer>
   );
 };
 
@@ -155,7 +224,7 @@ const Tab: FunctionComponent<TabProps> = props => {
 interface TabPanelsProps {
   children: React.ReactNode;
 }
-const TabPanels: FunctionComponent<TabPanelsProps> = ({ children }) => {
+export const TabPanels: FunctionComponent<TabPanelsProps> = ({ children }) => {
   return children;
 };
 
@@ -169,7 +238,7 @@ interface TabPanelProps {
   children: React.ReactNode;
 }
 
-const TabPanel: FunctionComponent<TabPanelProps> = props => {
+export const TabPanel: FunctionComponent<TabPanelProps> = props => {
   const { children, tabCode, ...restProps } = props;
   const tabContext = useContext(TabContext);
 
